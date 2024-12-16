@@ -3,14 +3,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DashboardData, User } from '../types/dashboard';
 import { dashboardService } from '../services/dashboardService';
 import { NavigationProp } from '@react-navigation/native';
+import { Platform } from 'react-native';
+
+// Define API_URL
+const API_URL = Platform.OS === 'android' 
+  ? 'http://10.0.2.2:3000/api'
+  : 'http://localhost:3000/api';
 
 interface DashboardContextType {
   dashboardData: DashboardData | null;
   isLoading: boolean;
   error: string | null;
-  updateUsers: (users: User[]) => Promise<void>;
   addUser: (user: Omit<User, 'id'>) => Promise<void>;
-  deleteUser: (userId: string) => Promise<void>;
   refreshDashboard: () => Promise<void>;
 }
 
@@ -23,7 +27,6 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load saved data on startup
   useEffect(() => {
     loadSavedData();
   }, []);
@@ -34,7 +37,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (savedData) {
         setDashboardData(JSON.parse(savedData));
       }
-      await refreshDashboard(); // Get fresh data from server
+      await refreshDashboard();
     } catch (err) {
       console.error('Error loading saved data:', err);
     }
@@ -48,37 +51,13 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   };
 
-  const updateUsers = async (users: User[]) => {
-    try {
-      console.log('Updating users:', users);
-      const response = await dashboardService.updateUsersOnServer(users);
-      
-      const updatedData = {
-        ...dashboardData!,
-        users: response.users,
-        lastUpdated: new Date().toISOString()
-      };
-      
-      setDashboardData(updatedData);
-      await saveDashboardData(updatedData);
-      
-      console.log('Users updated successfully');
-    } catch (err) {
-      console.error('Error updating users:', err);
-      setError('Failed to update users');
-      throw err;
-    }
-  };
-
   const addUser = async (user: Omit<User, 'id'>): Promise<void> => {
     try {
       console.log('Adding new user:', user);
       
-      // Call the service to add the user
       const newUser = await dashboardService.addUser(user);
       console.log('User added successfully:', newUser);
 
-      // Update local state with the new user
       const updatedData = {
         ...dashboardData!,
         users: [...(dashboardData?.users || []), newUser],
@@ -91,16 +70,6 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       console.error('Error adding user:', err);
       setError('Failed to add user');
       throw err;
-    }
-  };
-
-  const deleteUser = async (userId: string) => {
-    try {
-      const updatedUsers = dashboardData?.users.filter(u => u.id !== userId) || [];
-      await updateUsers(updatedUsers);
-    } catch (err) {
-      console.error('Error deleting user:', err);
-      setError('Failed to delete user');
     }
   };
 
@@ -143,9 +112,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         dashboardData,
         isLoading,
         error,
-        updateUsers,
         addUser,
-        deleteUser,
         refreshDashboard,
       }}>
       {children}

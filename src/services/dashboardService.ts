@@ -7,6 +7,8 @@ const API_URL = Platform.OS === 'android'
   ? 'http://10.0.2.2:3000/api'
   : 'http://localhost:3000/api';
 
+console.log('API_URL configured as:', API_URL);
+
 export const dashboardService = {
   fetchDashboardData: async (): Promise<DashboardData> => {
     try {
@@ -44,36 +46,6 @@ export const dashboardService = {
         throw new Error('Network connection failed. Please check your internet connection.');
       }
       throw error;
-    }
-  },
-
-  updateUsersOnServer: async (users: User[]): Promise<void> => {
-    const token = await AsyncStorage.getItem('userToken');
-    if (!token) {
-      throw new Error('No authentication token');
-    }
-
-    const response = await fetch(`${API_URL}/users`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': token,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ users }),
-    });
-
-    if (!response.ok) {
-      const text = await response.text();
-      console.error('Update users failed:', {
-        status: response.status,
-        response: text
-      });
-      throw new Error('Failed to update users');
-    }
-
-    const data = await response.json();
-    if (!data.success) {
-      throw new Error(data.message || 'Failed to update users');
     }
   },
 
@@ -136,5 +108,5 @@ export const dashboardService = {
       console.error('Add user error:', error);
       throw error;
     }
-  }
+  },
 }; 

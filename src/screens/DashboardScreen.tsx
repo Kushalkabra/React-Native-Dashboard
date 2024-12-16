@@ -18,7 +18,7 @@ type Props = {
 };
 
 const DashboardScreen: React.FC<Props> = ({ navigation }) => {
-  const { dashboardData, isLoading, deleteUser, refreshDashboard } = useDashboard();
+  const { dashboardData, isLoading, refreshDashboard } = useDashboard();
   const { updateAnalytics } = useAnalytics();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -56,20 +56,6 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
             </Text>
           </View>
         </View>
-      </View>
-      <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={() => navigation.navigate('EditUser', { user })}
-        >
-          <Text style={styles.editText}>Edit</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => handleDeleteUser(user.id)}
-        >
-          <Text style={styles.deleteText}>Remove</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -162,9 +148,10 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {dashboardData?.users.map(user => (
-            <UserCard key={user.id} user={user} />
-          ))}
+          {dashboardData?.users && dashboardData.users.map(user => {
+            console.log('Mapping user:', user);
+            return <UserCard key={user.id} user={user} />;
+          })}
         </View>
       </ScrollView>
     </View>
@@ -363,36 +350,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
     textTransform: 'uppercase',
-  },
-  deleteButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-    backgroundColor: '#FFEBEE',
-    borderWidth: 1,
-    borderColor: '#FFCDD2',
-  },
-  deleteText: {
-    color: '#D32F2F',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  editButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 10,
-    backgroundColor: '#E3F2FD',
-    borderWidth: 1,
-    borderColor: '#90CAF9',
-  },
-  editText: {
-    color: '#1565C0',
-    fontSize: 14,
-    fontWeight: '700',
   },
 });
 

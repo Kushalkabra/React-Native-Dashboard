@@ -26,7 +26,7 @@ const {
   PORT = 3000,
   JWT_SECRET = 'fallback-secret-key',
   JWT_EXPIRES_IN = '24h',
-  MONGODB_URI = 'mongodb://localhost:27017/admin_dashboard',
+  MONGODB_URI = 'mongodb+srv://kushalkabra23:Zsx9C744nAXoRFkl@cluster0.zxx8kud.mongodb.net/admin_dashboard',
   NODE_ENV = 'development',
   LOG_LEVEL = 'debug'
 } = process.env;
