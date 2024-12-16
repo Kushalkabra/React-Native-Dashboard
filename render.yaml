@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: react-native-dashboard-backend
+    env: node
+    buildCommand: cd backend && npm install && tsc
+    startCommand: cd backend && node dist/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 24h
+      - key: ALLOWED_ORIGINS
+        value: "*" 
